@@ -36,15 +36,15 @@ def extract(raw, level, impute_bd):
     rep_val=list(np.float_(re.split(",", rep_val)))
     
     #Global Variables (excluding vaccine effectiveness)
-    glob_input=pd.read_excel(raw,1).iloc[0:24,:]
+    glob_input=pd.read_excel(raw,2).iloc[0:24,:]
     
     #Setting Specific Variables (remember to include/exclude imputed coverage values but drop variable afterwards)
     
     if level=="LMICs" and impute_bd=="No":
-        set_pars=pd.read_excel(raw,2).iloc[0:136, 0:52].sort_values(by=["setting"])
-        set_pars_lb=pd.read_excel(raw,2).iloc[138:274, 0:52].sort_values(by=["setting"])
-        set_pars_ub=pd.read_excel(raw,2).iloc[276:412, 0:52].sort_values(by=["setting"])
-        sens_cost=pd.read_excel(raw,8).sort_values(by=["setting"])
+        set_pars=pd.read_excel(raw,3).iloc[0:136, 0:52].sort_values(by=["setting"])
+        set_pars_lb=pd.read_excel(raw,3).iloc[138:274, 0:52].sort_values(by=["setting"])
+        set_pars_ub=pd.read_excel(raw,3).iloc[276:412, 0:52].sort_values(by=["setting"])
+        sens_cost=pd.read_excel(raw,5).sort_values(by=["setting"])
         
         set_pars=set_pars[set_pars["cov_impute"]=="No"]
         set_pars_lb=set_pars_lb[set_pars_lb["cov_impute"]=="No"]
@@ -58,17 +58,17 @@ def extract(raw, level, impute_bd):
         settings=list(sens_cost.iloc[:,0])
         
     if level=="LMICs" and impute_bd=="Yes":
-        set_pars=pd.read_excel(raw,2).iloc[0:136, 0:50].sort_values(by=["setting"]).reset_index(drop=True)
-        set_pars_lb=pd.read_excel(raw,2).iloc[138:274, 0:50].sort_values(by=["setting"]).reset_index(drop=True)
-        set_pars_ub=pd.read_excel(raw,2).iloc[276:412, 0:50].sort_values(by=["setting"]).reset_index(drop=True)
-        sens_cost=pd.read_excel(raw,8).iloc[0:136, 0:35].sort_values(by=["setting"]).reset_index(drop=True)
+        set_pars=pd.read_excel(raw,3).iloc[0:136, 0:50].sort_values(by=["setting"]).reset_index(drop=True)
+        set_pars_lb=pd.read_excel(raw,3).iloc[138:274, 0:50].sort_values(by=["setting"]).reset_index(drop=True)
+        set_pars_ub=pd.read_excel(raw,3).iloc[276:412, 0:50].sort_values(by=["setting"]).reset_index(drop=True)
+        sens_cost=pd.read_excel(raw,5).iloc[0:136, 0:35].sort_values(by=["setting"]).reset_index(drop=True)
         settings=list(sens_cost.iloc[:,0])
     
     if level=="Regions":
-        set_pars=pd.read_excel(raw,3).iloc[0:7, 0:50].reset_index(drop=True)
-        set_pars_lb=pd.read_excel(raw,3).iloc[9:16,0:50].reset_index(drop=True)
-        set_pars_ub=pd.read_excel(raw,3).iloc[18:25,0:50].reset_index(drop=True)
-        sens_cost=pd.read_excel(raw,9).iloc[0:7, 0:35].reset_index(drop=True)
+        set_pars=pd.read_excel(raw,4).iloc[0:7, 0:50].reset_index(drop=True)
+        set_pars_lb=pd.read_excel(raw,4).iloc[9:16,0:50].reset_index(drop=True)
+        set_pars_ub=pd.read_excel(raw,4).iloc[18:25,0:50].reset_index(drop=True)
+        sens_cost=pd.read_excel(raw,6).iloc[0:7, 0:35].reset_index(drop=True)
         settings=list(sens_cost.iloc[:,0])
    
     #Dictionary 1: Model Assumptions
@@ -95,7 +95,7 @@ def ve_calcs(raw, runs, eff_map, eff_ctc):
     import numpy as np
     import pandas as pd
     
-    ve_raw=np.array(pd.read_excel(raw,1).iloc[24:29,1:4])
+    ve_raw=np.array(pd.read_excel(raw,2).iloc[24:29,1:4])
     
     if runs==1:
         ve_scc=ve_raw[:,0].reshape(5,runs)
@@ -113,7 +113,11 @@ def ve_calcs(raw, runs, eff_map, eff_ctc):
        ve_pert=np.zeros((5,runs))
        
        for i in range(5):
-           ve_pert[i,:]=np.random.uniform(ve_raw[i,1], ve_raw[i,2], size=runs)
+           if i>=0 and i<=3:
+               ve_pert[i,:]=np.random.triangular(ve_raw[i,1],ve_raw[i,0], ve_raw[i,2], size=runs)
+           else:
+               ve_pert[i,:]=np.random.uniform(ve_raw[i,1], ve_raw[i,2], size=runs)
+        
        
        ve_scc=ve_pert[:,:]
        vf_scc=1-ve_pert[:,:]
@@ -160,12 +164,19 @@ def dataprep(raw_inputs, runs):
         glob_pars=np.zeros((len(glob_input),runs))
         sett_pars=np.zeros((len(set_pars),runs,41))
         
+        ## To Update (04-02-2022)
+        ## Triangular Distribution: DALYs, Vaccine Effectiveness, Costs, Prevalence
+        ## Uniform Distribution: Disease Progression, Vaccination Coverage, Facility Births 
+        
         for i in range(len(glob_input)):
-            glob_pars[i,:]=np.random.uniform(glob_input.iloc[i,2], glob_input.iloc[i,3], size=runs)
+            if i>=20 and i<=23: #DALYs now triangular distribution
+                glob_pars[i,:]=np.random.triangular(glob_input.iloc[i,2],glob_input.iloc[i,1], glob_input.iloc[i,3], runs)
+            else:
+                glob_pars[i,:]=np.random.uniform(glob_input.iloc[i,2], glob_input.iloc[i,3], runs)
     
         for loc in range(len(set_pars)):
             for i in range(41):
-                if i==3 or i==4:
+                if (i==3 or i==4) or (i>=7 and i<=17):
                     sett_pars[loc,:,i]=np.random.triangular(set_pars_lb.iloc[loc,i+9], set_pars.iloc[loc,i+9], set_pars_ub.iloc[loc,i+9], runs)
                 else:
                     sett_pars[loc,:,i]=np.random.uniform(set_pars_lb.iloc[loc,i+9],set_pars_ub.iloc[loc,i+9], runs)
