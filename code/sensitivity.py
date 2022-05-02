@@ -69,7 +69,7 @@ for scen in range(3):
                 data_prepped["sett_pars"][loc,0,1]=raw_inputs["set_pars"].iloc[loc,10]
         #Vaccine Effectiveness - excluded for manuscript as when replacement, low VE means an erroneously negative ICER (more DALYs for more cost)
         if sen=="ve_lb":
-            eff_map=0.2
+            eff_map=0.8
             vac_eff=ve_calcs(raw, runs, eff_map, eff_ctc)
         if sen=="ve_ub":
             eff_map=1
