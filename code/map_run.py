@@ -1,6 +1,6 @@
 #   Set Working Directory
 import os
-os.chdir("C:/Users\seama\Dropbox\MAPs Modelling")
+os.chdir("C:/Users/seama/Dropbox/PLOS_MAP Update/Code and Results/code")
 
 # Import Required Packages
 import pandas as pd
@@ -23,12 +23,12 @@ eff_map=1    #Baseline assumption of equal effectiveness
 eff_ctc=1    #Baseline assumption of equal effectiveness
 
 #Import Excel Data
-databook="map_inputs.xlsx"
+databook="map_inputs_revision.xlsx"
 raw=pd.ExcelFile(databook)
 
 #Model Runs and Level
 runs=1000#pd.read_excel(raw,0).iloc[1,1] #can be manually overwritten
-level="Regions"#pd.read_excel(raw,0).iloc[2,1] #"Regions" or "LMICs", can be manually overwritten
+level="LMICs"#pd.read_excel(raw,0).iloc[2,1] #"Regions" or "LMICs", can be manually overwritten
 
 
 #Range of MAP price points to be analyzed --check that code is malliable to changes (baseline 0,10.25, 0.25); make a loop for MAP analyses so that price point indexing is done automatically
@@ -46,9 +46,9 @@ for idx,val in enumerate(map_price):
         five=int(idx)
 
 if runs ==1:
-    print ("Model configuration: "+ level+";"+str(runs)+" iteration")
+    print ("Model configuration: "+ level+"; "+str(runs)+" iteration")
 else:
-    print ("Model configuration: "+ level+";"+str(runs)+" iterations")
+    print ("Model configuration: "+ level+"; "+str(runs)+" iterations")
 
 #Extract and prepare the data
 settings,model_assumptions,raw_inputs=extract(raw, level, impute_bd)
