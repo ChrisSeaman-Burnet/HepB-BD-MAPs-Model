@@ -225,12 +225,12 @@ if level=="Regions":
     for idx,reg in enumerate(settings):
         plt.subplot(int(np.ceil(len(settings)/4)),int(np.ceil(len(settings)/2)), idx+1)
         p1=plt.plot(map_price_unit[:], main_s1_plot[idx,:,2], color='red', marker="^", alpha=0.5)                                        #main_s1_plot[idx,:,0]
-        p5=plt.fill_between(map_price_unit[:],main_s1_plot[idx,:,1], main_s1_plot[idx,:,3], alpha=0.3, color="red" )                                      #main_s1_plot[idx,:,0]
         p2=plt.plot(map_price_unit[:], main_s2_1_plot[idx,:,2], color='blue', marker="s", alpha=0.5)                                                       #main_s2_1_plot[idx,:,0]
-        p6=plt.fill_between(map_price_unit[:], main_s2_1_plot[idx,:,1], main_s2_1_plot[idx,:,3], alpha=0.3, color="blue" )                                #main_s2_1_plot[idx,:,0]
         p3=plt.plot(map_price_unit[:], main_s2_5_plot[idx,:,2],  color='green', marker="o", alpha=0.5)                                                           #main_s2_5_plot[idx,:,0]
-        p7=plt.fill_between(map_price_unit[:], main_s2_5_plot[idx,:,1], main_s2_5_plot[idx,:,3], alpha=0.3, color="green" )                                      #main_s2_5_plot[idx,:,0]
         p4=plt.plot(map_price_unit[:], main_s2_10_plot[idx,:,2], color='orange',marker="h", alpha=0.5)                                                           #main_s2_10_plot[idx,:,0]
+        p5=plt.fill_between(map_price_unit[:],main_s1_plot[idx,:,1], main_s1_plot[idx,:,3], alpha=0.3, color="red" )                                      #main_s1_plot[idx,:,0]
+        p6=plt.fill_between(map_price_unit[:], main_s2_1_plot[idx,:,1], main_s2_1_plot[idx,:,3], alpha=0.3, color="blue" )                                #main_s2_1_plot[idx,:,0]
+        p7=plt.fill_between(map_price_unit[:], main_s2_5_plot[idx,:,1], main_s2_5_plot[idx,:,3], alpha=0.3, color="green" )                                      #main_s2_5_plot[idx,:,0]
         p8=plt.fill_between(map_price_unit[:], main_s2_10_plot[idx,:,1], main_s2_10_plot[idx,:,3], alpha=0.3, color="orange" )                                   #main_s2_10_plot[idx,:,0]
         plt.xlim(0,5)
         plt.hlines(y=0, xmin=0, xmax=10, color="black", linestyle="--")
